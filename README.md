@@ -47,6 +47,8 @@ Below is an overview of the interface design, component layout, and user experie
 |   |                                                                                                 |
 |   |                                                                                [ Palette Dock ]   |
 +-------------------------------------------------------------------------------------------------------+
+<img width="1376" height="414" alt="image" src="https://github.com/user-attachments/assets/1310efb3-8b47-448c-b6a5-06c965b48e89" />
+
 ```
 
 ### Key Visual Highlights

@@ -10,7 +10,6 @@
 An ultra-modern, interactive **AI-Driven Whiteboard & Architecture Canvas** built with React 19, TypeScript, Vite, and Tailwind CSS. Transform prompt descriptions into schema-validated system architecture diagrams, microservice layouts, mind maps, flowcharts, and sequence diagrams in seconds.
 
 🔗 **Live Application:** [https://ankietagre.github.io/Ai-whiteborad/](https://ankietagre.github.io/Ai-whiteborad/)  
-📁 **GitHub Repository:** [https://github.com/ANKIETAGRE/Ai-whiteborad](https://github.com/ANKIETAGRE/Ai-whiteborad)
 
 
 

@@ -115,46 +115,48 @@ export const PromptInput: React.FC<PromptInputProps> = ({ onGenerate, isGenerati
           </button>
         </div>
 
-        {/* Bottom Options Bar: Capsule Pill Diagram Type Track & Layout Engine Dropdown */}
-        <div className="flex flex-wrap items-center justify-between pt-2.5 border-t border-white/10 px-3 text-xs text-slate-300 relative z-10 gap-3">
-          {/* Diagram Type Pill Capsule Track */}
-          <div className="flex items-center gap-2.5">
-            <span className="font-extrabold text-slate-300 flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
-              <Layers className="w-3.5 h-3.5 text-purple-400" /> Type:
-            </span>
-            <div className="flex items-center gap-1 bg-slate-950/80 p-1 rounded-full border border-indigo-500/30 backdrop-blur-xl shadow-inner">
-              {(['architecture', 'flowchart', 'mindmap', 'sequence', 'cloud'] as DiagramType[]).map(t => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => setDiagramType(t)}
-                  className={`px-3.5 py-1 rounded-full text-xs font-semibold capitalize transition-all duration-200 ${
-                    diagramType === t 
-                      ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-500 text-white shadow-[0_0_20px_rgba(139,92,246,0.6)] border border-purple-400/50 scale-105 font-bold' 
-                      : 'text-slate-300 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
+        {/* Bottom Options Bar: Shown ONLY when user clicks on Advanced Controls button */}
+        {showAdvanced && (
+          <div className="flex flex-wrap items-center justify-between pt-2.5 border-t border-white/10 px-3 text-xs text-slate-300 relative z-10 gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
+            {/* Diagram Type Pill Capsule Track */}
+            <div className="flex items-center gap-2.5">
+              <span className="font-extrabold text-slate-300 flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
+                <Layers className="w-3.5 h-3.5 text-purple-400" /> Type:
+              </span>
+              <div className="flex items-center gap-1 bg-slate-950/80 p-1 rounded-full border border-indigo-500/30 backdrop-blur-xl shadow-inner">
+                {(['architecture', 'flowchart', 'mindmap', 'sequence', 'cloud'] as DiagramType[]).map(t => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setDiagramType(t)}
+                    className={`px-3.5 py-1 rounded-full text-xs font-semibold capitalize transition-all duration-200 ${
+                      diagramType === t 
+                        ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-500 text-white shadow-[0_0_20px_rgba(139,92,246,0.6)] border border-purple-400/50 scale-105 font-bold' 
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Layout Engine Dropdown */}
+            <div className="flex items-center gap-2.5">
+              <span className="font-extrabold text-slate-300 text-[11px] uppercase tracking-wider">Layout Engine:</span>
+              <select
+                value={layoutAlgorithm}
+                onChange={e => setLayoutAlgorithm(e.target.value as any)}
+                className="bg-slate-950/90 text-slate-200 font-semibold text-xs rounded-xl px-3.5 py-1.5 border border-indigo-500/30 outline-none cursor-pointer hover:border-indigo-400 transition-colors shadow-inner backdrop-blur-xl"
+              >
+                <option value="hierarchical">Hierarchical (DAG)</option>
+                <option value="horizontal">Horizontal Flow</option>
+                <option value="grid">Matrix Grid</option>
+                <option value="radial">Radial Mindmap</option>
+              </select>
             </div>
           </div>
-
-          {/* Layout Engine Dropdown */}
-          <div className="flex items-center gap-2.5">
-            <span className="font-extrabold text-slate-300 text-[11px] uppercase tracking-wider">Layout Engine:</span>
-            <select
-              value={layoutAlgorithm}
-              onChange={e => setLayoutAlgorithm(e.target.value as any)}
-              className="bg-slate-950/90 text-slate-200 font-semibold text-xs rounded-xl px-3.5 py-1.5 border border-indigo-500/30 outline-none cursor-pointer hover:border-indigo-400 transition-colors shadow-inner backdrop-blur-xl"
-            >
-              <option value="hierarchical">Hierarchical (DAG)</option>
-              <option value="horizontal">Horizontal Flow</option>
-              <option value="grid">Matrix Grid</option>
-              <option value="radial">Radial Mindmap</option>
-            </select>
-          </div>
-        </div>
+        )}
       </form>
     </div>
   );

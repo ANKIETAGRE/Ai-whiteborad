@@ -473,8 +473,8 @@ export const Canvas: React.FC<CanvasProps> = ({
           const isSelected = selectedNodeId === node.id;
           const isSticky = node.type === 'sticky-note';
           const isText = node.type === 'text';
-          const width = node.width || (isSticky ? 160 : 190);
-          const height = node.height || (isSticky ? 160 : 85);
+          const width = node.width || (isSticky ? 160 : isText ? 240 : 190);
+          const height = isText ? undefined : (node.height || (isSticky ? 160 : 85));
           const accentColor = node.color || '#6366f1';
 
           return (
@@ -487,7 +487,8 @@ export const Canvas: React.FC<CanvasProps> = ({
                 left: `${node.position.x}px`,
                 top: `${node.position.y}px`,
                 width: `${width}px`,
-                height: `${height}px`
+                height: height ? `${height}px` : 'auto',
+                minHeight: isText ? '44px' : undefined
               }}
               className={`absolute transition-all rounded-2xl select-none z-10 ${
                 activeTool === 'select'
@@ -497,11 +498,11 @@ export const Canvas: React.FC<CanvasProps> = ({
                 isSticky
                   ? 'bg-amber-400/90 text-gray-900 shadow-xl border border-amber-300 p-4 font-sans'
                   : isText
-                  ? 'bg-indigo-950/40 text-white p-2 font-mono text-sm border border-indigo-500/30 rounded-xl'
+                  ? 'bg-indigo-950/70 backdrop-blur-md text-white p-3 font-mono text-sm border border-indigo-500/40 rounded-2xl shadow-xl shadow-indigo-950/50'
                   : 'glass-card p-3.5 flex flex-col justify-between'
               } ${
                 isSelected
-                  ? 'ring-2 ring-offset-2 ring-offset-gray-900 ring-indigo-500 shadow-2xl shadow-indigo-500/30'
+                  ? 'ring-2 ring-offset-2 ring-offset-gray-900 ring-indigo-500 shadow-2xl shadow-indigo-500/40 border-indigo-400'
                   : ''
               }`}
             >
@@ -522,19 +523,25 @@ export const Canvas: React.FC<CanvasProps> = ({
                   <span className="text-[10px] text-amber-800/60 font-mono">Double click to edit</span>
                 </div>
               ) : isText ? (
-                <div>
+                <div className="w-full h-full flex flex-col justify-center">
                   {editingNodeId === node.id ? (
-                    <input
-                      type="text"
+                    <textarea
                       value={editingLabel}
                       onChange={e => setEditingLabel(e.target.value)}
                       onBlur={() => handleSaveLabel(node.id)}
-                      onKeyDown={e => e.key === 'Enter' && handleSaveLabel(node.id)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSaveLabel(node.id);
+                        }
+                      }}
                       autoFocus
-                      className="bg-gray-800 text-white text-xs px-2 py-1 rounded border border-indigo-500 outline-none w-full font-mono"
+                      className="bg-slate-900 text-white text-xs p-2 rounded-xl border border-indigo-400 outline-none w-full resize-none font-mono min-h-[44px]"
                     />
                   ) : (
-                    <div className="text-indigo-200 font-bold text-sm tracking-wide">{node.label}</div>
+                    <div className="text-indigo-100 font-bold text-sm tracking-wide leading-relaxed break-words whitespace-pre-wrap">
+                      {node.label}
+                    </div>
                   )}
                 </div>
               ) : (

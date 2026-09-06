@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { CheckCircle2, AlertCircle, Info } from 'lucide-react';
 import { Header } from './components/Header/Header';
@@ -61,8 +61,8 @@ export function App() {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   // Canvas Pan & Zoom
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 100, y: 40 });
+  const [zoom, setZoom] = useState(0.75);
+  const [pan, setPan] = useState({ x: 100, y: 60 });
 
   // AI Pipeline Execution State
   const [isGenerating, setIsGenerating] = useState(false);
@@ -98,11 +98,11 @@ export function App() {
     setAuditLogs([...securityEngine.getAuditLogs()]);
   };
 
-  // Auto-fit diagram to screen view helper
+  // Auto-fit diagram to screen view helper with comfortable zoomed-out framing
   const handleFitDiagramToView = (nodesList: DiagramNode[]) => {
     if (nodesList.length === 0) {
-      setZoom(1);
-      setPan({ x: 100, y: 40 });
+      setZoom(0.75);
+      setPan({ x: 100, y: 60 });
       return;
     }
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
@@ -117,22 +117,27 @@ export function App() {
 
     const screenW = window.innerWidth || 1200;
     const screenH = window.innerHeight || 800;
-    const diagramW = maxX - minX + 160;
-    const diagramH = maxY - minY + 160;
+    const diagramW = maxX - minX + 340;
+    const diagramH = maxY - minY + 340;
 
-    const scaleX = (screenW - 220) / diagramW;
-    const scaleY = (screenH - 260) / diagramH;
-    const optimalZoom = Math.max(0.45, Math.min(1.0, Math.min(scaleX, scaleY)));
+    const scaleX = (screenW - 320) / diagramW;
+    const scaleY = (screenH - 340) / diagramH;
+    const optimalZoom = Math.max(0.35, Math.min(0.78, Math.min(scaleX, scaleY)));
 
     const centerX = (minX + maxX) / 2;
     const centerY = (minY + maxY) / 2;
 
     const targetPanX = screenW / 2 - centerX * optimalZoom;
-    const targetPanY = screenH / 2 - centerY * optimalZoom;
+    const targetPanY = screenH / 2 - centerY * optimalZoom + 35;
 
-    setZoom(optimalZoom);
+    setZoom(Number(optimalZoom.toFixed(2)));
     setPan({ x: Math.round(targetPanX), y: Math.round(targetPanY) });
   };
+
+  // Automatically fit initial diagram on page load
+  useEffect(() => {
+    handleFitDiagramToView(INITIAL_DIAGRAM.nodes);
+  }, []);
 
   // Toggle User Tier for Rate Limit Testing
   const handleToggleUserTier = () => {

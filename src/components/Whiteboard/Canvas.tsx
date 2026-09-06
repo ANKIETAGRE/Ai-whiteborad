@@ -94,6 +94,41 @@ export const Canvas: React.FC<CanvasProps> = ({
   const screenW = window.innerWidth || 1200;
   const screenH = window.innerHeight || 800;
 
+  // Strict Pan Boundary Clamping helper to prevent diagram from being panned off-screen
+  const clampPan = (newPan: { x: number; y: number }) => {
+    if (nodes.length === 0) return newPan;
+
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    nodes.forEach(n => {
+      const w = n.width || 190;
+      const h = n.height || 85;
+      if (n.position.x < minX) minX = n.position.x;
+      if (n.position.x + w > maxX) maxX = n.position.x + w;
+      if (n.position.y < minY) minY = n.position.y;
+      if (n.position.y + h > maxY) maxY = n.position.y + h;
+    });
+
+    const sW = window.innerWidth || 1200;
+    const sH = window.innerHeight || 800;
+    const marginX = 220;
+    const marginY = 160;
+
+    const maxPanX = sW - marginX - minX * zoom;
+    const minPanX = marginX - maxX * zoom;
+    const maxPanY = sH - marginY - minY * zoom;
+    const minPanY = marginY - maxY * zoom;
+
+    const limitMinX = Math.min(minPanX, maxPanX);
+    const limitMaxX = Math.max(minPanX, maxPanX);
+    const limitMinY = Math.min(minPanY, maxPanY);
+    const limitMaxY = Math.max(minPanY, maxPanY);
+
+    const clampedX = Math.max(limitMinX, Math.min(limitMaxX, newPan.x));
+    const clampedY = Math.max(limitMinY, Math.min(limitMaxY, newPan.y));
+
+    return { x: Math.round(clampedX), y: Math.round(clampedY) };
+  };
+
   // Scrollbar ratios
   const hThumbWidthPct = Math.max(10, Math.min(100, (screenW / (totalW * zoom)) * 100));
   const vThumbHeightPct = Math.max(10, Math.min(100, (screenH / (totalH * zoom)) * 100));
@@ -101,23 +136,23 @@ export const Canvas: React.FC<CanvasProps> = ({
   const hThumbLeftPct = Math.max(0, Math.min(100 - hThumbWidthPct, ((-pan.x - bounds.minX * zoom) / (totalW * zoom)) * 100));
   const vThumbTopPct = Math.max(0, Math.min(100 - vThumbHeightPct, ((-pan.y - bounds.minY * zoom) / (totalH * zoom)) * 100));
 
-  // Handle Wheel Scroll (touchpad & mouse wheel horizontal/vertical panning)
+  // Handle Wheel Scroll with strict pan boundary clamping
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
     const handleWheel = (e: WheelEvent) => {
-      if (e.ctrlKey) return; // Allow pinch zoom
+      if (e.ctrlKey) return;
       e.preventDefault();
-      onPanChange({
+      onPanChange(clampPan({
         x: pan.x - e.deltaX,
         y: pan.y - e.deltaY
-      });
+      }));
     };
 
     el.addEventListener('wheel', handleWheel, { passive: false });
     return () => el.removeEventListener('wheel', handleWheel);
-  }, [pan, onPanChange]);
+  }, [pan, onPanChange, nodes, zoom]);
 
   // Click on Horizontal Scrollbar Track
   const handleHScrollClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -125,7 +160,7 @@ export const Canvas: React.FC<CanvasProps> = ({
     const clickX = e.clientX - rect.left;
     const pct = clickX / rect.width;
     const targetPanX = -(bounds.minX * zoom + pct * totalW * zoom - screenW / 2);
-    onPanChange({ ...pan, x: Math.round(targetPanX) });
+    onPanChange(clampPan({ ...pan, x: Math.round(targetPanX) }));
   };
 
   // Click on Vertical Scrollbar Track
@@ -134,7 +169,7 @@ export const Canvas: React.FC<CanvasProps> = ({
     const clickY = e.clientY - rect.top;
     const pct = clickY / rect.height;
     const targetPanY = -(bounds.minY * zoom + pct * totalH * zoom - screenH / 2);
-    onPanChange({ ...pan, y: Math.round(targetPanY) });
+    onPanChange(clampPan({ ...pan, y: Math.round(targetPanY) }));
   };
 
   // Icon mapping
@@ -247,10 +282,10 @@ export const Canvas: React.FC<CanvasProps> = ({
     setCurrentMousePos(coords);
 
     if (isPanning) {
-      onPanChange({
+      onPanChange(clampPan({
         x: e.clientX - startPan.x,
         y: e.clientY - startPan.y
-      });
+      }));
       return;
     }
 

@@ -27,7 +27,7 @@ import { exportToJSON, exportToSVG, exportToPNG } from './services/exportService
 
 const INITIAL_DIAGRAM: DiagramSchema = {
   diagram_type: 'architecture',
-  title: 'AI SaaS Platform Architecture',
+  title: 'AI Whiteboard',
   nodes: [
     { id: 'web-app', type: 'service', label: 'Web App (React/Vite)', sublabel: 'Frontend Client', icon: 'Layout', color: '#6366f1', position: { x: 400, y: 100 }, width: 210, height: 90 },
     { id: 'api-gateway', type: 'gateway', label: 'API Gateway (FastAPI)', sublabel: 'Auth & Security WAF', icon: 'Shield', color: '#8b5cf6', position: { x: 400, y: 260 }, width: 210, height: 90 },

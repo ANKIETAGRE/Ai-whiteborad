@@ -51,7 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
                 {diagramSchema.diagram_type}
               </span>
             </div>
-            <p className="text-xs text-gray-400">Schema-Validated AI Architecture Canvas</p>
+            <p className="text-xs text-gray-400">Schema-Validated AI Whiteboard Canvas</p>
           </div>
         </div>
       </div>

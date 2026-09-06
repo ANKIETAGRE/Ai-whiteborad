@@ -1,6 +1,6 @@
 import type { DiagramSchema, DiagramNode } from '../types/diagram';
 
-// Helper to escape XML special characters
+// Helper to escape XML special characters for safe SVG string insertion
 function escapeXml(unsafe: string = ''): string {
   return unsafe.replace(/[<>&'"]/g, (c) => {
     switch (c) {
@@ -14,7 +14,7 @@ function escapeXml(unsafe: string = ''): string {
   });
 }
 
-// Generate self-contained SVG string from diagram schema
+// Generate clean self-contained SVG string from diagram schema
 export function generateSVGString(diagram: DiagramSchema): string {
   const nodes = diagram.nodes || [];
   const edges = diagram.edges || [];
@@ -35,10 +35,10 @@ export function generateSVGString(diagram: DiagramSchema): string {
   }
 
   const padding = 70;
-  const startX = minX - padding;
-  const startY = minY - padding;
-  const width = Math.max(400, (maxX - minX) + padding * 2);
-  const height = Math.max(300, (maxY - minY) + padding * 2);
+  const startX = Math.round(minX - padding);
+  const startY = Math.round(minY - padding);
+  const width = Math.max(400, Math.round((maxX - minX) + padding * 2));
+  const height = Math.max(300, Math.round((maxY - minY) + padding * 2));
 
   // Map nodes by ID for fast connector coordinate calculation
   const nodeMap = new Map<string, DiagramNode>();
@@ -93,14 +93,16 @@ export function generateSVGString(diagram: DiagramSchema): string {
       labelSvg = `
         <g transform="translate(${midX - labelWidth / 2}, ${midY - 10})">
           <rect width="${labelWidth}" height="20" rx="10" fill="#0f172a" stroke="${color}" stroke-opacity="0.5" stroke-width="1" />
-          <text x="${labelWidth / 2}" y="13" font-family="system-ui, sans-serif" font-size="10" font-weight="600" fill="#cbd5e1" text-anchor="middle">${labelText}</text>
+          <text x="${labelWidth / 2}" y="13" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#cbd5e1" text-anchor="middle">${labelText}</text>
         </g>
       `;
     }
 
+    const markerId = `arrow-${color.replace(/[^a-zA-Z0-9]/g, '')}`;
+
     return `
       <g class="diagram-edge">
-        <path d="${pathD}" stroke="${color}" stroke-width="2" stroke-dasharray="${strokeDasharray}" fill="none" marker-end="url(#arrow-${color.replace('#', '')})" opacity="0.85" />
+        <path d="${pathD}" stroke="${color}" stroke-width="2" stroke-dasharray="${strokeDasharray}" fill="none" marker-end="url(#${markerId})" opacity="0.85" />
         ${labelSvg}
       </g>
     `;
@@ -110,11 +112,14 @@ export function generateSVGString(diagram: DiagramSchema): string {
   const edgeColors = Array.from(new Set(edges.map(e => e.color || '#6366f1')));
   if (edgeColors.length === 0) edgeColors.push('#6366f1');
 
-  const markerDefs = edgeColors.map(c => `
-    <marker id="arrow-${c.replace('#', '')}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+  const markerDefs = edgeColors.map(c => {
+    const markerId = `arrow-${c.replace(/[^a-zA-Z0-9]/g, '')}`;
+    return `
+    <marker id="${markerId}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="${c}" />
     </marker>
-  `).join('\n');
+  `;
+  }).join('\n');
 
   // Render Nodes
   const nodeSvgElements = nodes.map(node => {
@@ -131,8 +136,8 @@ export function generateSVGString(diagram: DiagramSchema): string {
       return `
         <g transform="translate(${x}, ${y})" class="diagram-node">
           <rect width="${w}" height="${h}" rx="8" fill="#fef08a" stroke="#eab308" stroke-width="1.5" />
-          <text x="12" y="24" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#854d0e">${label}</text>
-          ${sublabel ? `<text x="12" y="44" font-family="system-ui, sans-serif" font-size="11" fill="#a16207">${sublabel}</text>` : ''}
+          <text x="12" y="24" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#854d0e">${label}</text>
+          ${sublabel ? `<text x="12" y="44" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#a16207">${sublabel}</text>` : ''}
         </g>
       `;
     }
@@ -140,7 +145,7 @@ export function generateSVGString(diagram: DiagramSchema): string {
     if (node.type === 'text') {
       return `
         <g transform="translate(${x}, ${y})" class="diagram-node">
-          <text x="0" y="20" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#f1f5f9">${label}</text>
+          <text x="0" y="20" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="600" fill="#f1f5f9">${label}</text>
         </g>
       `;
     }
@@ -150,29 +155,26 @@ export function generateSVGString(diagram: DiagramSchema): string {
 
     return `
       <g transform="translate(${x}, ${y})" class="diagram-node">
-        <!-- Glow Shadow -->
-        <rect width="${w}" height="${h}" rx="12" fill="${color}" fill-opacity="0.05" />
         <!-- Node Card Base -->
-        <rect width="${w}" height="${h}" rx="12" fill="#0f172a" stroke="${color}" stroke-opacity="0.6" stroke-width="1.5" />
+        <rect width="${w}" height="${h}" rx="12" fill="#0f172a" stroke="${color}" stroke-opacity="0.7" stroke-width="1.5" />
         <!-- Top Accent Bar -->
         <rect width="${w}" height="4" rx="2" fill="${color}" />
-        <!-- Icon Container Badge -->
-        <rect x="12" y="14" width="28" height="28" rx="8" fill="${color}" fill-opacity="0.2" stroke="${color}" stroke-opacity="0.4" stroke-width="1" />
+        <!-- Icon Badge Container -->
+        <rect x="12" y="14" width="28" height="28" rx="8" fill="${color}" fill-opacity="0.25" stroke="${color}" stroke-opacity="0.4" stroke-width="1" />
         <circle cx="26" cy="28" r="4" fill="${color}" />
         
         <!-- Node Titles -->
-        <text x="48" y="27" font-family="system-ui, sans-serif" font-size="12" font-weight="700" fill="#f8fafc">${label}</text>
-        ${sublabel ? `<text x="48" y="39" font-family="system-ui, sans-serif" font-size="10" fill="#94a3b8">${sublabel}</text>` : ''}
+        <text x="48" y="27" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#f8fafc">${label}</text>
+        ${sublabel ? `<text x="48" y="39" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#94a3b8">${sublabel}</text>` : ''}
         
-        <!-- Category Badge Tag -->
-        <rect x="12" y="${h - 22}" width="${tagWidth}" height="14" rx="4" fill="${color}" fill-opacity="0.15" />
-        <text x="18" y="${h - 11}" font-family="system-ui, sans-serif" font-size="8" font-weight="800" fill="${color}">${nodeType}</text>
+        <!-- Category Tag -->
+        <rect x="12" y="${h - 22}" width="${tagWidth}" height="14" rx="4" fill="${color}" fill-opacity="0.2" />
+        <text x="18" y="${h - 11}" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="8" font-weight="800" fill="${color}">${nodeType}</text>
       </g>
     `;
   }).join('\n');
 
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="${startX} ${startY} ${width} ${height}" width="${width}" height="${height}">
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${startX} ${startY} ${width} ${height}" width="${width}" height="${height}">
   <defs>
     <pattern id="grid-dots" width="20" height="20" patternUnits="userSpaceOnUse">
       <circle cx="2" cy="2" r="1" fill="#334155" fill-opacity="0.3" />
@@ -184,9 +186,9 @@ export function generateSVGString(diagram: DiagramSchema): string {
   <rect x="${startX}" y="${startY}" width="${width}" height="${height}" fill="#090d16" />
   <rect x="${startX}" y="${startY}" width="${width}" height="${height}" fill="url(#grid-dots)" />
 
-  <!-- Diagram Title Header -->
-  <text x="${startX + 24}" y="${startY + 36}" font-family="system-ui, sans-serif" font-size="16" font-weight="800" fill="#6366f1">${escapeXml(diagram.title || 'AI Architecture Diagram')}</text>
-  <text x="${startX + 24}" y="${startY + 52}" font-family="system-ui, sans-serif" font-size="10" font-weight="600" fill="#64748b">Generated with AI Whiteboard Canvas</text>
+  <!-- Title Header -->
+  <text x="${startX + 24}" y="${startY + 36}" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#6366f1">${escapeXml(diagram.title || 'AI Whiteboard')}</text>
+  <text x="${startX + 24}" y="${startY + 52}" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#64748b">Generated with AI Whiteboard Canvas</text>
 
   <!-- Edges Group -->
   <g class="edges-layer">
@@ -200,20 +202,34 @@ export function generateSVGString(diagram: DiagramSchema): string {
 </svg>`;
 }
 
+// Helper to trigger browser download safely
+function downloadFile(url: string, fileName: string, isObjectUrl = true) {
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', fileName);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  if (isObjectUrl) {
+    // Keep URL active long enough for browser to finish downloading
+    setTimeout(() => {
+      try {
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        // ignore
+      }
+    }, 5000);
+  }
+}
+
 // 1. Export JSON Schema
 export function exportToJSON(diagram: DiagramSchema) {
   const jsonStr = JSON.stringify(diagram, null, 2);
   const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
   const url = URL.createObjectURL(blob);
-  
-  const link = document.createElement('a');
-  link.href = url;
-  const fileName = `${(diagram.title || 'diagram').toLowerCase().replace(/[^a-z0-9]+/g, '_')}_schema.json`;
-  link.setAttribute('download', fileName);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  const fileName = `${(diagram.title || 'ai_whiteboard').toLowerCase().replace(/[^a-z0-9]+/g, '_')}_schema.json`;
+  downloadFile(url, fileName, true);
 }
 
 // 2. Export SVG Vector Image
@@ -221,69 +237,76 @@ export function exportToSVG(diagram: DiagramSchema) {
   const svgString = generateSVGString(diagram);
   const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(blob);
-
-  const link = document.createElement('a');
-  link.href = url;
-  const fileName = `${(diagram.title || 'diagram').toLowerCase().replace(/[^a-z0-9]+/g, '_')}_diagram.svg`;
-  link.setAttribute('download', fileName);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  const fileName = `${(diagram.title || 'ai_whiteboard').toLowerCase().replace(/[^a-z0-9]+/g, '_')}_diagram.svg`;
+  downloadFile(url, fileName, true);
 }
 
 // 3. Export High-Resolution PNG Image
 export function exportToPNG(diagram: DiagramSchema, onSuccess?: () => void, onError?: (err: any) => void) {
   try {
     const svgString = generateSVGString(diagram);
-    const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
+    
+    // Create Data URI for Image source to avoid Blob URL CORS canvas tainting
+    const svgDataUri = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
     const img = new Image();
 
     img.onload = () => {
       try {
         const canvas = document.createElement('canvas');
-        const scale = 2; // High-DPI crisp export
-        canvas.width = img.width * scale;
-        canvas.height = img.height * scale;
+        const scale = 2; // Crisp 2x scale
+        
+        // Extract width and height from SVG bounding box
+        const widthMatch = svgString.match(/width="(\d+)"/);
+        const heightMatch = svgString.match(/height="(\d+)"/);
+        const svgW = widthMatch ? parseInt(widthMatch[1], 10) : (img.naturalWidth || img.width || 1200);
+        const svgH = heightMatch ? parseInt(heightMatch[1], 10) : (img.naturalHeight || img.height || 800);
+
+        canvas.width = svgW * scale;
+        canvas.height = svgH * scale;
 
         const ctx = canvas.getContext('2d');
         if (!ctx) {
-          if (onError) onError('Could not initialize canvas context');
+          if (onError) onError('Could not initialize 2D canvas context');
           return;
         }
 
-        ctx.scale(scale, scale);
-        ctx.drawImage(img, 0, 0);
-        URL.revokeObjectURL(url);
+        // Fill background
+        ctx.fillStyle = '#090d16';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        canvas.toBlob((pngBlob) => {
-          if (!pngBlob) {
-            if (onError) onError('Could not generate PNG blob');
-            return;
-          }
-          const pngUrl = URL.createObjectURL(pngBlob);
-          const link = document.createElement('a');
-          link.href = pngUrl;
-          const fileName = `${(diagram.title || 'diagram').toLowerCase().replace(/[^a-z0-9]+/g, '_')}_diagram.png`;
-          link.setAttribute('download', fileName);
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          URL.revokeObjectURL(pngUrl);
+        ctx.scale(scale, scale);
+        ctx.drawImage(img, 0, 0, svgW, svgH);
+
+        const fileName = `${(diagram.title || 'ai_whiteboard').toLowerCase().replace(/[^a-z0-9]+/g, '_')}_diagram.png`;
+
+        if (canvas.toBlob) {
+          canvas.toBlob((pngBlob) => {
+            if (pngBlob) {
+              const pngUrl = URL.createObjectURL(pngBlob);
+              downloadFile(pngUrl, fileName, true);
+              if (onSuccess) onSuccess();
+            } else {
+              // Fallback to dataURL
+              const pngDataUrl = canvas.toDataURL('image/png');
+              downloadFile(pngDataUrl, fileName, false);
+              if (onSuccess) onSuccess();
+            }
+          }, 'image/png');
+        } else {
+          const pngDataUrl = canvas.toDataURL('image/png');
+          downloadFile(pngDataUrl, fileName, false);
           if (onSuccess) onSuccess();
-        }, 'image/png');
+        }
       } catch (err) {
         if (onError) onError(err);
       }
     };
 
     img.onerror = (err) => {
-      URL.revokeObjectURL(url);
       if (onError) onError(err);
     };
 
-    img.src = url;
+    img.src = svgDataUri;
   } catch (err) {
     if (onError) onError(err);
   }

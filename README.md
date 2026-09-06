@@ -12,6 +12,9 @@ An ultra-modern, interactive **AI-Driven Whiteboard & Architecture Canvas** buil
 🔗 **Live Application:** [https://ankietagre.github.io/Ai-whiteborad/](https://ankietagre.github.io/Ai-whiteborad/)  
 📁 **GitHub Repository:** [https://github.com/ANKIETAGRE/Ai-whiteborad](https://github.com/ANKIETAGRE/Ai-whiteborad)
 
+<img width="1376" height="414" alt="image" src="https://github.com/user-attachments/assets/2f8dea1e-a32f-4eb3-8ca5-701395746bb2" />
+
+
 ---
 
 ## 🎨 How It Looks (Visual Interface & Architecture Canvas)

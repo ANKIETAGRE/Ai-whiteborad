@@ -42,7 +42,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({ onGenerate, isGenerati
   };
 
   return (
-    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 w-11/12 max-w-5xl select-none">
+    <div className="absolute top-3.5 left-1/2 -translate-x-1/2 z-30 w-11/12 max-w-3xl select-none">
       {/* Quick Prompt Preset Chips */}
       <div className="flex items-center gap-2.5 mb-2.5 overflow-x-auto pb-1 scrollbar-none">
         <span className="text-xs font-extrabold text-indigo-300 uppercase tracking-widest flex items-center gap-1.5 shrink-0 bg-slate-900/90 backdrop-blur-xl border border-indigo-500/30 px-3.5 py-1.5 rounded-full shadow-lg">

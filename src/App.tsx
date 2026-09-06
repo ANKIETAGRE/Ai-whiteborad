@@ -60,9 +60,9 @@ export function App() {
   const [activeTool, setActiveTool] = useState<'select' | 'node' | 'connector' | 'sticky' | 'draw' | 'text'>('select');
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
-  // Canvas Pan & Zoom
-  const [zoom, setZoom] = useState(0.75);
-  const [pan, setPan] = useState({ x: 100, y: 60 });
+  // Canvas Pan & Zoom (100% scale)
+  const [zoom, setZoom] = useState(1.0);
+  const [pan, setPan] = useState({ x: 100, y: 40 });
 
   // AI Pipeline Execution State
   const [isGenerating, setIsGenerating] = useState(false);
@@ -98,11 +98,11 @@ export function App() {
     setAuditLogs([...securityEngine.getAuditLogs()]);
   };
 
-  // Auto-fit diagram to screen view helper with comfortable zoomed-out framing
+  // Auto-fit diagram to screen at 100% scale (1:1 full size)
   const handleFitDiagramToView = (nodesList: DiagramNode[]) => {
     if (nodesList.length === 0) {
-      setZoom(0.75);
-      setPan({ x: 100, y: 60 });
+      setZoom(1.0);
+      setPan({ x: 100, y: 40 });
       return;
     }
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
@@ -117,24 +117,18 @@ export function App() {
 
     const screenW = window.innerWidth || 1200;
     const screenH = window.innerHeight || 800;
-    const diagramW = maxX - minX + 340;
-    const diagramH = maxY - minY + 340;
-
-    const scaleX = (screenW - 320) / diagramW;
-    const scaleY = (screenH - 340) / diagramH;
-    const optimalZoom = Math.max(0.35, Math.min(0.78, Math.min(scaleX, scaleY)));
 
     const centerX = (minX + maxX) / 2;
     const centerY = (minY + maxY) / 2;
 
-    const targetPanX = screenW / 2 - centerX * optimalZoom;
-    const targetPanY = screenH / 2 - centerY * optimalZoom + 35;
+    const targetPanX = screenW / 2 - centerX * 1.0;
+    const targetPanY = screenH / 2 - centerY * 1.0 + 30;
 
-    setZoom(Number(optimalZoom.toFixed(2)));
+    setZoom(1.0);
     setPan({ x: Math.round(targetPanX), y: Math.round(targetPanY) });
   };
 
-  // Automatically fit initial diagram on page load
+  // Automatically fit initial diagram on page load at 100% scale
   useEffect(() => {
     handleFitDiagramToView(INITIAL_DIAGRAM.nodes);
   }, []);

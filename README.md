@@ -12,47 +12,16 @@ An ultra-modern, interactive **AI-Driven Whiteboard & Architecture Canvas** buil
 🔗 **Live Application:** [https://ankietagre.github.io/Ai-whiteborad/](https://ankietagre.github.io/Ai-whiteborad/)  
 📁 **GitHub Repository:** [https://github.com/ANKIETAGRE/Ai-whiteborad](https://github.com/ANKIETAGRE/Ai-whiteborad)
 
-<img width="1376" height="414" alt="image" src="https://github.com/user-attachments/assets/2f8dea1e-a32f-4eb3-8ca5-701395746bb2" />
 
 
----
+
 
 ## 🎨 How It Looks (Visual Interface & Architecture Canvas)
 
 Below is an overview of the interface design, component layout, and user experience:
 
-```
-+-------------------------------------------------------------------------------------------------------+
-|  AI SaaS Platform Architecture [Architecture]       🛡️ WAF Active | Quota: 10/10 hr  [Logs] [History] [Export] |
-+-------------------------------------------------------------------------------------------------------+
-|  💡 PROMPTS: [AI SaaS Architecture] [E-Commerce Microservices] [Product Roadmap Mindmap]              |
-|  [  Describe your architecture or workflow...                            ] [ ⚙️ ] [  Generate ✨  ]    |
-+-------------------------------------------------------------------------------------------------------+
-|   |                                                                                                   |
-| T |                                     +----------------------+                                      |
-| O |                                     |   Web App (React/..) |                                      |
-| O |                                     |   [Frontend Client]  |                                      |
-| L |                                     +----------+-----------+                                      |
-| B |                                                |                                                  |
-| A |                                          HTTPS Request                                            |
-| R |                                                v                                                  |
-|   |                                     +----------+-----------+                                      |
-| D |                                     |  API Gateway (Fo...) |                                      |
-| O |                                     |  [Auth & Security]   |                                      |
-| C |                                     +----+-----------+-----+                                      |
-| K |                                         /             \                                           |
-|   |                       Generate Diagram /               \ Persist State                            |
-|   |                                       v                 v                                         |
-|   |                     +-----------------+---+   Save DB   +------------------+                      |
-|   |                     |  AI Service Engine  |<----------->|  PostgreSQL DB   |                      |
-|   |                     | Prompt -> Diagram JS|             | Users & Diagrams |                      |
-|   |                     +---------------------+             +------------------+                      |
-|   |                                                                                                 |
-|   |                                                                                [ Palette Dock ]   |
-+-------------------------------------------------------------------------------------------------------+
-<img width="1376" height="414" alt="image" src="https://github.com/user-attachments/assets/1310efb3-8b47-448c-b6a5-06c965b48e89" />
+<img width="1915" height="875" alt="image" src="https://github.com/user-attachments/assets/df66bb4c-d42e-42ec-8745-5974b856bb38" />
 
-```
 
 ### Key Visual Highlights
 

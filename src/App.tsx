@@ -23,6 +23,7 @@ import type {
 import { aiService } from './services/aiService';
 import { securityEngine } from './services/securityEngine';
 import { layoutEngine } from './services/layoutEngine';
+import { exportToJSON, exportToSVG, exportToPNG } from './services/exportService';
 
 const INITIAL_DIAGRAM: DiagramSchema = {
   diagram_type: 'architecture',
@@ -252,18 +253,18 @@ export function App() {
   // Export File (SVG, PNG, JSON)
   const handleExport = (exportType: 'svg' | 'png' | 'json') => {
     if (exportType === 'json') {
-      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(diagram, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute('href', dataStr);
-      downloadAnchor.setAttribute('download', `${diagram.title.toLowerCase().replace(/\s+/g, '_')}_diagram.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+      exportToJSON(diagram);
       showToast('Downloaded JSON Diagram Schema', 'success');
-      return;
+    } else if (exportType === 'svg') {
+      exportToSVG(diagram);
+      showToast('Exported diagram as SVG vector file', 'success');
+    } else if (exportType === 'png') {
+      exportToPNG(
+        diagram,
+        () => showToast('Exported diagram as high-res PNG image', 'success'),
+        (err) => showToast(`Failed to export PNG: ${err?.message || err}`, 'error')
+      );
     }
-
-    showToast(`Exported diagram as ${exportType.toUpperCase()}`, 'success');
   };
 
   // Restore Previous Version

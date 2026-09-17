@@ -8,6 +8,7 @@
 [![Vite](https://img.shields.io/badge/Vite-6.2-646cff?style=flat&logo=vite)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-v4.0-38bdf8?style=flat&logo=tailwindcss)](https://tailwindcss.com/)
 
+
 An ultra-modern, interactive **AI-Driven Whiteboard & Architecture Canvas** built with React 19, TypeScript, Vite, and Tailwind CSS. Transform prompt descriptions into schema-validated system architecture diagrams, microservice layouts, mind maps, flowcharts, and sequence diagrams in seconds.
 
 🔗 **Live Application:** [https://ankietagre.github.io/Ai-whiteborad/](https://ankietagre.github.io/Ai-whiteborad/)  

@@ -1,6 +1,5 @@
 # 🪄 AI SaaS Architecture Whiteboard
 
-
 [![Deploy to GitHub Pages](https://github.com/ANKIETAGRE/Ai-whiteborad/actions/workflows/deploy.yml/badge.svg)](https://github.com/ANKIETAGRE/Ai-whiteborad/actions/workflows/deploy.yml)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-6366f1?style=flat&logo=github)](https://ankietagre.github.io/Ai-whiteborad/)
 [![React 19](https://img.shields.io/badge/React-19.0-61dafb?style=flat&logo=react)](https://react.dev/)
